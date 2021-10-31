@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace PepApi.Models
 {
@@ -44,7 +45,10 @@ namespace PepApi.Models
 
         public static Person FromCsv(string csvLine)
         {
-            string[] values = csvLine.Split(',');
+           
+            //string[] values = csvLine.Split(',');
+            Regex CSVParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+            string[] values = CSVParser.Split(csvLine);
             Person person = new Person();
             person.id = values[0].TrimStart('"').TrimEnd('"');
             person.schema = values[1].TrimStart('"').TrimEnd('"');
