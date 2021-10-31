@@ -27,14 +27,18 @@ namespace PepApi.Controllers
         [HttpGet]
         public Pep Get(string name)
         {
-            Console.WriteLine(name);
+            
+           if(name != "") { 
             List<Person> persons = people.FindAll(x => x.name.ToLower().Contains(name.ToLower()));
-
-            Pep pep = new Pep();
-            pep.hits = persons;
-            pep.numberOfHits = persons.Count();
-
-            return pep;
+            if(persons.Count > 0) { 
+                Pep pep = new Pep();
+                pep.hits = persons;
+                pep.numberOfHits = persons.Count();
+                return pep;
+                }
+            }
+            return null;
+            
         }
     }
 }

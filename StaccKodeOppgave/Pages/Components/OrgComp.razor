@@ -2,9 +2,9 @@
 @page "/Org"
 @using Newtonsoft.Json;
 @using StaccKodeOppgave.Models;
-<h3>Sjekk opp organisation</h3>
+<h3>Sjekk opp organisasjon</h3>
 <input @bind="orgnr" placeholder="981078365">
-<button @onclick="@(() => getOrgData())"> Søk organisasjon</button>
+<button @onclick="@(() => getOrgData())"> Søk </button>
 @if (orgRoller != null && company != null)
 {
     <br />
@@ -19,7 +19,8 @@
     <p> <b> Konkurs </b> @(company.konkurs ? "Ja" : "Nei") </p>
     <p> <b> Under avvikling </b> @(company.underAvvikling ? "Ja" : "Nei")  </p>
     <p> <b> Under tvangsavvikling eller tvangsopplosning</b> @(company.underTvangsavviklingEllerTvangsopplosning ? "Ja" : "Nei") </p>
-
+    @if (!showPepCheck)
+    {
     @foreach (OrgRoller o in orgRoller)
     {
         if (o.roller != null)
@@ -42,9 +43,13 @@
                         @if (r.person != null)
                         {
                             <p> <b> Navn </b></p>
-                            <p> @(r.person.navn != null ? r.person.navn.fornavn +" " + r.person.navn.etternavn : "") </p>
+                            <p> @(r.person.navn != null ? r.person.navn.fornavn + " " + r.person.navn.etternavn : "") </p>
                             <p> <b> Fødselsdato </b></p>
                             <p> @(r.person.fodselsdato != null ? r.person.fodselsdato : "") </p>
+                            string name = r.person.navn.fornavn + " " + r.person.navn.etternavn;
+                            <button type="button" @onclick="() => pepCheck(name)">
+                                Pep check
+                            </button>
                         }
                     </div>
 
@@ -52,17 +57,26 @@
             }
         }
     }
-}
+    } else
+            {
+                <PersonComp orgPepCheck="true" pep="@pep" />
+                <button type="button" @onclick="() => showPepCheck = false"> Back </button>
+            }
+    }
 @code {
 
-
+    bool showPepCheck;
     int? orgnr { get; set; }
+
+    public Pep pep;
 
     public Company company { get; set; }
 
     public List<OrgRoller> orgRoller { get; set; }
 
-    string baseurl = "https://stacc-code-challenge-2021.azurewebsites.net";
+    string baseurlOrg = "https://stacc-code-challenge-2021.azurewebsites.net";
+
+    string baseurlpers = "https://stacc-code-challenge-2021.azurewebsites.net";//"https://localhost:6044";
 
     String dataOrg { get; set; }
 
@@ -72,13 +86,19 @@
         await getOrgDataRoller();
     }
 
+    public async Task pepCheck(string name)
+    {
+        showPepCheck = true;
+        await getPersonData(name);
+
+    }
+
 
     protected async Task getCompData()
     {
-        //string baseUrl = localBaseUrl;
 
         var request = new HttpRequestMessage(HttpMethod.Get,
-        baseurl + "/api/enheter?orgNr=" + orgnr);
+        baseurlOrg + "/api/enheter?orgNr=" + orgnr);
 
         var client = ClientFactory.CreateClient();
 
@@ -97,30 +117,40 @@
 
     protected async Task getOrgDataRoller()
     {
-        //string baseUrl = localBaseUrl;
 
         var request = new HttpRequestMessage(HttpMethod.Get,
-        baseurl + "/api/roller?orgNr=" + orgnr);
+        baseurlOrg + "/api/roller?orgNr=" + orgnr);
 
         var client = ClientFactory.CreateClient();
 
         var response = await client.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            //Console.WriteLine(await response.Content.ReadAsStringAsync());
             orgRoller = JsonConvert.DeserializeObject<List<OrgRoller>>(await response.Content.ReadAsStringAsync());
-            foreach (OrgRoller t in orgRoller)
-            {
-                Console.WriteLine(t.ToString());
-            }
-
-            //Console.WriteLine(orgRoller);
-            //dataOrg = await response.Content.ReadAsStringAsync();
+ 
 
         }
         else
         {
             dataOrg = "Cant find Organization";
         }
+    }
+
+    protected async Task getPersonData(string name)
+    {
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+        baseurlpers + "/api/pep?name=" + name);
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            pep = JsonConvert.DeserializeObject<Pep>(await response.Content.ReadAsStringAsync());
+
+        }
+        Console.WriteLine(pep);
+
     }
 }

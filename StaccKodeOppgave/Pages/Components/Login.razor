@@ -1,0 +1,9 @@
+﻿<AuthorizeView>
+    <Authorized>
+        Innlogget som, @context.User.Identity.Name
+        <a href="MicrosoftIdentity/Account/SignOut">Logg ut</a>
+    </Authorized>
+    <NotAuthorized>
+        <a href="MicrosoftIdentity/Account/SignIn">Logg inn</a>
+    </NotAuthorized>
+</AuthorizeView>
