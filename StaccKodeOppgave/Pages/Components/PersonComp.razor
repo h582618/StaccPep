@@ -1,15 +1,18 @@
 ﻿@inject IHttpClientFactory ClientFactory
 @page "/Person"
 @using StaccKodeOppgave.Models;
-@using System.Text.Json
 @using Newtonsoft.Json;
 <div class="pepdiv">
-    <h3>PEP Check</h3>
-    <input @bind="name" placeholder="Navn">
-    <button @onclick="@(() => getPersonData())"> Søk</button>
-    <br />
-    <br />
-    @if (pep != null && pep.hits != null)
+
+    @if (!orgPepCheck)
+    {
+        <h3>PEP Check</h3>
+        <input @bind="name" placeholder="Navn">
+        <button @onclick="@(() => getPersonData())"> Søk</button>
+        <br />
+        <br />
+    }
+    @if (pep != null && pep.hits != null && pep.numberOfHits > 0)
     {
         <h5> Number of hits @pep.numberOfHits</h5>
         @foreach (Person p in pep.hits)
@@ -27,7 +30,7 @@
                     @if (p.score > 0)
                     {
                         <p> <b> Score </b></p>
-                        <p> @p.score </p>
+                        <p> @Math.Round(p.score, 5) </p>
                     }
                     <p> <b> Fødselsdato </b></p>
                     <p> @p.birth_date </p>
@@ -38,21 +41,41 @@
             </div>
         }
     }
+    else if (dataPers != null)
+    {
+        <br />
+        <h5>  @dataPers </h5>
+    }
+    else if (orgPepCheck && pep == null)
+    {
+        <br />
+        <h5> Not a pep </h5>
+    }
+
+
+
 </div>
 @code {
 
+    [Parameter]
+    public String name { get; set; }
 
-    String name { get; set; }
+    [Parameter]
+    public bool orgPepCheck { get; set; }
+
+
+    [Parameter]
+    public Pep pep { get; set; }
 
     int orgnr { get; set; }
 
-    string baseurl = "https://localhost:6044"; //"https://stacc-code-challenge-2021.azurewebsites.net"; //https://localhost:6044
+    string baseurl = "https://stacc-code-challenge-2021.azurewebsites.net"; //https://localhost:6044
 
     String dataPers { get; set; }
 
     String dataOrg { get; set; }
 
-    Pep pep { get; set; } = null;
+    
 
 
     protected async Task getPersonData()
@@ -66,33 +89,13 @@
         var response = await client.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            dataPers = await response.Content.ReadAsStringAsync();
             pep = JsonConvert.DeserializeObject<Pep>(await response.Content.ReadAsStringAsync());
+            dataPers = null;
         }
         else
         {
-            dataPers = "Cant find person";
+            dataPers = "Not a pep";
         }
     }
 
-    protected async Task getOrgData()
-    {
-        //string baseUrl = localBaseUrl;
-
-        var request = new HttpRequestMessage(HttpMethod.Get,
-        baseurl + "/api/enheter?orgNr=" + orgnr);
-
-        var client = ClientFactory.CreateClient();
-
-        var response = await client.SendAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            dataOrg = await response.Content.ReadAsStringAsync();
-            pep = JsonConvert.DeserializeObject<Pep>(await response.Content.ReadAsStringAsync());
-        }
-        else
-        {
-            dataOrg = "Cant find Organization";
-        }
-    }
 }

@@ -15,8 +15,10 @@ namespace PepApi.Data
         }
 
         public static List<Person> getData()
-        {      
-            return File.ReadAllLines("data/pep.csv")
+        {
+            string azure = "/home/site/wwwroot/pep.csv";
+            string lokalt = "data/pep.csv";
+            return File.ReadAllLines(lokalt)
                     .Skip(1)
                     .Select(v => Person.FromCsv(v))
                     .ToList();

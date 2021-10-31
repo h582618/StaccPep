@@ -9,5 +9,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="wwwroot\" />
+    <Folder Include="obj\Debug\net5.0\staticwebassets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Release\net5.0\ref\pep.csv" />
+    <None Include="wwwroot\pep.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\" />
+    <Content Remove="wwwroot\pep.csv" />
   </ItemGroup>
 </Project>

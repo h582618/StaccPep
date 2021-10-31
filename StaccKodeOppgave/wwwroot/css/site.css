@@ -56,7 +56,10 @@ a, .btn-link {
 .person {
     display: inline-flex;
     margin-right: 10px;
+    margin-bottom: 10px;
     border-style: solid;
+    width: 30%;
+    height: 250px;
     border-width: medium;
 }
 
@@ -70,6 +73,9 @@ a, .btn-link {
 }
 
 .pers_inf p {
+    margin: 0px;
+}
+p {
     margin: 0px;
 }
 
