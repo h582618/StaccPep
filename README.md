@@ -7,8 +7,7 @@ Kunne også autentisert API mot web app med client credentials flow, men droppet
 Har ikke fokusert mye på frontend, så er ikke så vakkert som det kunne blitt.
 
 ## Hvordan kjøre prosjektet
-For eksempel ***yarn start***
-> Husk å pakke med alle avhengigheter.
+dotnet watch run på både API og web app.
 
 URL 
 https://staccpep.azurewebsites.net
