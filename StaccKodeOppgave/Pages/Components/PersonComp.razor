@@ -46,7 +46,7 @@
 
     int orgnr { get; set; }
 
-    string baseurl = "https://stacc-code-challenge-2021.azurewebsites.net"; //https://localhost:6044
+    string baseurl = "https://localhost:6044"; //"https://stacc-code-challenge-2021.azurewebsites.net"; //https://localhost:6044
 
     String dataPers { get; set; }
 
@@ -57,7 +57,6 @@
 
     protected async Task getPersonData()
     {
-        //string baseUrl = localBaseUrl;
 
         var request = new HttpRequestMessage(HttpMethod.Get,
         baseurl + "/api/pep?name=" + name);
