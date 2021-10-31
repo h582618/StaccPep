@@ -15,11 +15,7 @@ namespace PepApi.Data
         }
 
         public static List<Person> getData()
-        {
-            TextFieldParser parser = new TextFieldParser("data/pep.csv");
-            parser.HasFieldsEnclosedInQuotes = true;
-            parser.SetDelimiters(",");
-           
+        {      
             return File.ReadAllLines("data/pep.csv")
                     .Skip(1)
                     .Select(v => Person.FromCsv(v))
