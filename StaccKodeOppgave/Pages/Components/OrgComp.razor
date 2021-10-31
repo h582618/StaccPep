@@ -1,0 +1,126 @@
+﻿@inject IHttpClientFactory ClientFactory
+@page "/Org"
+@using Newtonsoft.Json;
+@using StaccKodeOppgave.Models;
+<h3>Sjekk opp organisation</h3>
+<input @bind="orgnr" placeholder="981078365">
+<button @onclick="@(() => getOrgData())"> Søk organisasjon</button>
+@if (orgRoller != null && company != null)
+{
+    <br />
+
+    <br />
+
+    <h5> <b> Bedrift : </b>   @company.navn </h5>
+    <p> <b> Org : </b> @company.organisasjonsform.beskrivelse  </p>
+    <p> <b> Næringsområde : </b > @company.naeringskode1.beskrivelse </p>
+    <p> <b> Stiftelsesdato : </b> @company.stiftelsesdato  </p>
+    <p> <b> Ansatte : </b> @company.antallAnsatte  </p>
+    <p> <b> Konkurs </b> @(company.konkurs ? "Ja" : "Nei") </p>
+    <p> <b> Under avvikling </b> @(company.underAvvikling ? "Ja" : "Nei")  </p>
+    <p> <b> Under tvangsavvikling eller tvangsopplosning</b> @(company.underTvangsavviklingEllerTvangsopplosning ? "Ja" : "Nei") </p>
+
+    @foreach (OrgRoller o in orgRoller)
+    {
+        if (o.roller != null)
+        {
+            @foreach (Rolle r in o.roller)
+            {
+
+                <div class="person">
+
+                    <div class="img">
+
+                        <img src="person.png" />
+                    </div>
+                    <div class="pers_inf">
+                        @if (r.type != null && r.type.beskrivelse != null)
+                        {
+                            <p> <b> Beskrivelse </b></p>
+                            <p> @(r.type.beskrivelse != null ? r.type.beskrivelse : "")  </p>
+                        }
+                        @if (r.person != null)
+                        {
+                            <p> <b> Navn </b></p>
+                            <p> @(r.person.navn != null ? r.person.navn.fornavn +" " + r.person.navn.etternavn : "") </p>
+                            <p> <b> Fødselsdato </b></p>
+                            <p> @(r.person.fodselsdato != null ? r.person.fodselsdato : "") </p>
+                        }
+                    </div>
+
+                </div>
+            }
+        }
+    }
+}
+@code {
+
+
+    int? orgnr { get; set; }
+
+    public Company company { get; set; }
+
+    public List<OrgRoller> orgRoller { get; set; }
+
+    string baseurl = "https://stacc-code-challenge-2021.azurewebsites.net";
+
+    String dataOrg { get; set; }
+
+    public async Task getOrgData()
+    {
+        await getCompData();
+        await getOrgDataRoller();
+    }
+
+
+    protected async Task getCompData()
+    {
+        //string baseUrl = localBaseUrl;
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+        baseurl + "/api/enheter?orgNr=" + orgnr);
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            dataOrg = await response.Content.ReadAsStringAsync();
+            company = JsonConvert.DeserializeObject<Company>(await response.Content.ReadAsStringAsync());
+
+        }
+        else
+        {
+            dataOrg = "Cant find Organization";
+        }
+    }
+
+    protected async Task getOrgDataRoller()
+    {
+        //string baseUrl = localBaseUrl;
+
+        var request = new HttpRequestMessage(HttpMethod.Get,
+        baseurl + "/api/roller?orgNr=" + orgnr);
+
+        var client = ClientFactory.CreateClient();
+
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            //Console.WriteLine(await response.Content.ReadAsStringAsync());
+            orgRoller = JsonConvert.DeserializeObject<List<OrgRoller>>(await response.Content.ReadAsStringAsync());
+            foreach (OrgRoller t in orgRoller)
+            {
+                Console.WriteLine(t.ToString());
+            }
+
+            //Console.WriteLine(orgRoller);
+            //dataOrg = await response.Content.ReadAsStringAsync();
+
+        }
+        else
+        {
+            dataOrg = "Cant find Organization";
+        }
+    }
+}
