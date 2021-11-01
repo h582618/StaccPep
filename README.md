@@ -19,5 +19,10 @@ Dette kunne løses med å publisere web app som --nozip, ha csv file som ren str
 Da jeg ikke har god tid denne uken siden jeg har 2 eksamener om et par dager, så har jeg utelat dette. 
 Web app bruker altså deres API deployet. 
 
-
+Hva jeg hadde tatt mer hensyn til i en reel applikasjon
+* Bedre feil/unntaks håndtering, både try catch i API og web app
+* Lagre filer i azure blob storage, eller ha en database. Men ettersom et eksternt API blir brukt kunne jeg heller laget et downstream web API som håndterer disse kallene fra dataen i open sanctions, og brønnøysundregisteret.
+* Deployet API etter punktet over er fullført.
+* Autentisert API mot web app med client credentials flow (server to server).
+* Penere frontend, med mer forklaring for hvordan web appen skal brukes.
 
